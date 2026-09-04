@@ -88,10 +88,17 @@ report history — it just starts tracking from that point forward. After
 that, any new report they upload shows up in the Discord channel within one
 polling interval.
 
+## 6. Keep it running
+
+A plain `npm start` only lasts as long as the terminal stays open. On an
+Ubuntu server, use the included systemd unit — see
+[`deploy/wcl-discord-bot.service`](deploy/wcl-discord-bot.service) for setup
+steps (copy the repo to the server, adjust the paths/user in the unit file,
+then `systemctl enable --now` it). systemd gives you auto-restart on crash,
+start-on-boot, and logs via `journalctl -u wcl-discord-bot -f` with no extra
+tooling needed.
+
 ## Notes
 
 - State (which report codes have already been announced) is stored in
   `data/seen-reports.json`. Delete it if you ever want to reset.
-- To run this continuously, use a process manager (`pm2`, a `systemd`
-  service, a Docker container, etc.) or host it on a small VPS — a plain
-  `npm start` only runs as long as the terminal/session stays open.
