@@ -1,0 +1,84 @@
+# wcl-discord-bot
+
+A Discord bot that posts an announcement in a channel whenever one of your
+tracked players uploads a new Warcraft Logs report.
+
+Warcraft Logs doesn't offer a push webhook for "report created," so this bot
+polls the WCL v2 GraphQL API on an interval (5 minutes by default) and
+announces any reports it hasn't seen before, per tracked uploader.
+
+## 1. Create a Discord bot
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) → **New Application**.
+2. Under **Bot**, click **Reset Token** / **Copy** to get your bot token. Keep it secret.
+3. Under **Bot**, make sure **Message Content Intent** is *not* required here (this bot only sends messages, it doesn't read them), so no privileged intents are needed.
+4. Under **OAuth2 → URL Generator**, check scope `bot`, and under bot permissions check `Send Messages` and `View Channel`. Open the generated URL and invite the bot to your server.
+5. In Discord, enable Developer Mode (User Settings → Advanced), then right-click the channel you want announcements in and **Copy Channel ID**.
+
+## 2. Create a Warcraft Logs API client
+
+1. Log into Warcraft Logs, go to <https://www.warcraftlogs.com/api/clients/>.
+2. Create a new client (any name/redirect URL, this bot only uses the
+   client-credentials flow so the redirect URL doesn't matter).
+3. Copy the **Client ID** and **Client Secret**.
+
+## 3. Configure the bot
+
+```bash
+cp .env.example .env
+```
+
+Fill in `.env`:
+
+```
+DISCORD_BOT_TOKEN=...
+DISCORD_CHANNEL_ID=...
+WCL_CLIENT_ID=...
+WCL_CLIENT_SECRET=...
+POLL_INTERVAL_MINUTES=5
+```
+
+## 4. Pick who to track
+
+Warcraft Logs doesn't let you look up a player's numeric user ID from just
+their username — you need one report they've already uploaded. For each
+player you want to track:
+
+```bash
+npm install
+npm run resolve-uploader -- <report-code>
+```
+
+(The report code is the part after `/reports/` in a WCL report URL, e.g. for
+`https://www.warcraftlogs.com/reports/AbCdEfGhJ23K` it's `AbCdEfGhJ23K` — any
+report they've uploaded works, even an old one.)
+
+This prints their numeric user ID. Add each one to `config/uploaders.json`:
+
+```json
+[
+  { "id": 123456, "label": "Thrall" },
+  { "id": 789012, "label": "Jaina" }
+]
+```
+
+`label` is just the display name used in the Discord message.
+
+## 5. Run it
+
+```bash
+npm start
+```
+
+The first poll after adding a new uploader won't announce their existing
+report history — it just starts tracking from that point forward. After
+that, any new report they upload shows up in the Discord channel within one
+polling interval.
+
+## Notes
+
+- State (which report codes have already been announced) is stored in
+  `data/seen-reports.json`. Delete it if you ever want to reset.
+- To run this continuously, use a process manager (`pm2`, a `systemd`
+  service, a Docker container, etc.) or host it on a small VPS — a plain
+  `npm start` only runs as long as the terminal/session stays open.
