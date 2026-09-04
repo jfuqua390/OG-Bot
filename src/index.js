@@ -1,8 +1,17 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { config } from './config.js';
 import { startPolling } from './poller.js';
+import { registerChewyResponder } from './chewyResponder.js';
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
+
+registerChewyResponder(client, config.discord.ogChannelId);
 
 client.once('ready', async () => {
   console.log(`[discord] Logged in as ${client.user.tag}`);

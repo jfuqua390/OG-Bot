@@ -11,7 +11,7 @@ announces any reports it hasn't seen before, per tracked uploader.
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) → **New Application**.
 2. Under **Bot**, click **Reset Token** / **Copy** to get your bot token. Keep it secret.
-3. Under **Bot**, make sure **Message Content Intent** is *not* required here (this bot only sends messages, it doesn't read them), so no privileged intents are needed.
+3. Under **Bot**, enable the **Message Content Intent** toggle (a privileged intent). The bot needs this to detect the "chewy sucks" gif trigger (see below) — without it, Discord will reject the bot's login.
 4. Under **OAuth2 → URL Generator**, check scope `bot`, and under bot permissions check `Send Messages` and `View Channel`. Open the generated URL and invite the bot to your server.
 5. In Discord, enable Developer Mode (User Settings → Advanced), then right-click the channel you want announcements in and **Copy Channel ID**.
 
@@ -33,10 +33,15 @@ Fill in `.env`:
 ```
 DISCORD_BOT_TOKEN=...
 DISCORD_CHANNEL_ID=...
+DISCORD_OG_CHANNEL_ID=...
 WCL_CLIENT_ID=...
 WCL_CLIENT_SECRET=...
 POLL_INTERVAL_MINUTES=5
 ```
+
+`DISCORD_OG_CHANNEL_ID` is the channel the bot watches for the "chewy sucks"
+gif trigger (see [Notes](#notes)) — copy its ID the same way as
+`DISCORD_CHANNEL_ID` above.
 
 ## 4. Pick who to track
 
@@ -114,3 +119,8 @@ needed.
 
 - State (which report codes have already been announced) is stored in
   `data/seen-reports.json`. Delete it if you ever want to reset.
+- **Easter egg**: anyone who types "chewy sucks" (case-insensitive, anywhere
+  in the message) in the channel at `DISCORD_OG_CHANNEL_ID` gets a gif reply.
+  See [`src/chewyResponder.js`](src/chewyResponder.js). Purely for fun — has
+  no effect on WCL polling, and if `DISCORD_OG_CHANNEL_ID` is unset it's
+  simply disabled.
