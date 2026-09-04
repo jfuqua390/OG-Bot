@@ -21,10 +21,31 @@ client.once('ready', async () => {
       );
     }
 
-    await channel.send('✅ Test message from wcl-discord-bot — if you can see this, the bot is configured correctly.');
+    await channel.send('✅ Test message from Fooks bot — if you can see this, the bot is configured correctly.');
     console.log(`[discord] Test message sent to #${channel.name ?? channel.id}.`);
   } catch (err) {
-    console.error(err.message);
+    if (err.code === 50001) {
+      console.error(
+        `Missing Access: the bot can't see channel ${config.discord.channelId}. ` +
+          `Either it hasn't been invited to that server yet (use the OAuth2 URL ` +
+          `Generator in the Developer Portal with scope "bot" and permissions ` +
+          `"View Channel" + "Send Messages"), or that channel's permission ` +
+          `overwrites are hiding it from the bot's role.`
+      );
+    } else if (err.code === 10003) {
+      console.error(
+        `Unknown Channel: ${config.discord.channelId} doesn't exist (or isn't ` +
+          `visible to this bot). Double-check DISCORD_CHANNEL_ID.`
+      );
+    } else if (err.code === 50013) {
+      console.error(
+        `Missing Permissions: the bot can see channel ${config.discord.channelId} ` +
+          `but isn't allowed to send messages there. Check its permission ` +
+          `overwrites for "Send Messages".`
+      );
+    } else {
+      console.error(err.message);
+    }
     process.exitCode = 1;
   } finally {
     client.destroy();
