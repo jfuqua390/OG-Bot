@@ -66,6 +66,19 @@ This prints their numeric user ID. Add each one to `config/uploaders.json`:
 
 ## 5. Run it
 
+First, confirm the Discord side is wired up correctly:
+
+```bash
+npm run test-message
+```
+
+This logs in, sends a one-off test message to `DISCORD_CHANNEL_ID`, then exits.
+If it fails, double-check `DISCORD_BOT_TOKEN`/`DISCORD_CHANNEL_ID` and that the
+bot was actually invited to the server with `View Channel`/`Send Messages`
+permission on that channel.
+
+Then start the bot for real:
+
 ```bash
 npm start
 ```

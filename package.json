@@ -6,7 +6,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "resolve-uploader": "node src/resolveUploader.js"
+    "resolve-uploader": "node src/resolveUploader.js",
+    "test-message": "node src/sendTestMessage.js"
   },
   "engines": {
     "node": ">=18.0.0"
