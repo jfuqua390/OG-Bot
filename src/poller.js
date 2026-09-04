@@ -1,13 +1,48 @@
+import { EmbedBuilder } from 'discord.js';
 import { config, loadUploaders } from './config.js';
 import { fetchRecentReportsForUser, reportUrl } from './wclClient.js';
 import { SeenStore } from './seenStore.js';
 
-function formatAnnouncement(uploaderLabel, report) {
-  const zone = report.zone?.name ? ` in **${report.zone.name}**` : '';
-  return (
-    `📜 New Warcraft Logs report from **${uploaderLabel}**${zone}\n` +
-    `**${report.title}** — ${reportUrl(report.code)}`
-  );
+// Warcraft Logs doesn't grant avatar access to app (client-credentials) tokens
+// — only to tokens authorized by that specific user — so we can't show their
+// real profile picture. Use the WCL logo as consistent card branding instead.
+const WCL_ICON_URL = 'https://assets.rpglogs.com/img/warcraft/favicon.png';
+const WCL_EMBED_COLOR = 0xe1a83a; // Warcraft Logs' orange/gold brand color
+
+function formatDuration(startTime, endTime) {
+  if (typeof startTime !== 'number' || typeof endTime !== 'number') return null;
+  const totalSeconds = Math.round((endTime - startTime) / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m ${seconds}s`;
+}
+
+// Builds a Discord message payload (a rich embed "card") for a new report.
+export function formatAnnouncement(uploaderLabel, report) {
+  const embed = new EmbedBuilder()
+    .setColor(WCL_EMBED_COLOR)
+    .setAuthor({ name: `New report from ${uploaderLabel}`, iconURL: WCL_ICON_URL })
+    .setTitle(report.title)
+    .setURL(reportUrl(report.code))
+    .setThumbnail(WCL_ICON_URL)
+    .setFooter({ text: 'Warcraft Logs', iconURL: WCL_ICON_URL });
+
+  if (report.zone?.name) {
+    embed.addFields({ name: 'Zone', value: report.zone.name, inline: true });
+  }
+  if (Array.isArray(report.fights)) {
+    embed.addFields({ name: 'Pulls', value: String(report.fights.length), inline: true });
+  }
+  const duration = formatDuration(report.startTime, report.endTime);
+  if (duration) {
+    embed.addFields({ name: 'Duration', value: duration, inline: true });
+  }
+  if (typeof report.startTime === 'number') {
+    embed.setTimestamp(report.startTime);
+  }
+
+  return { content: `New Warcraft Logs report from **${uploaderLabel}**`, embeds: [embed] };
 }
 
 // Checks every configured uploader for new reports and calls `announce`

@@ -5,9 +5,15 @@
 #      there.
 #   2. Edit User=/WorkingDirectory= below to match where you deployed it and
 #      which user should own the process (don't run it as root).
-#   3. sudo cp deploy/og-bot.service /etc/systemd/system/
-#   4. sudo systemctl daemon-reload
-#   5. sudo systemctl enable --now og-bot
+#   3. Create the data directory referenced by ReadWritePaths below — it must
+#      exist BEFORE the service starts, since ProtectSystem=strict makes
+#      everything else read-only and systemd can't create missing
+#      ReadWritePaths entries on its own:
+#        sudo mkdir -p /opt/OG-Bot/data
+#        sudo chown og-bot:og-bot /opt/OG-Bot/data
+#   4. sudo cp deploy/og-bot.service /etc/systemd/system/
+#   5. sudo systemctl daemon-reload
+#   6. sudo systemctl enable --now og-bot
 #
 # Useful commands:
 #   sudo systemctl status og-bot

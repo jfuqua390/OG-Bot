@@ -19,6 +19,7 @@ export const config = {
   discord: {
     token: requireEnv('DISCORD_BOT_TOKEN'),
     channelId: requireEnv('DISCORD_CHANNEL_ID'),
+    ogChannelId: requireEnv('DISCORD_OG_CHANNEL_ID'),
   },
   wcl: {
     clientId: requireEnv('WCL_CLIENT_ID'),

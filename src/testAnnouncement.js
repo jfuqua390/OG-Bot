@@ -1,12 +1,35 @@
-// CLI helper: logs into Discord, sends a test message to the configured
-// channel, then exits. Use this to confirm DISCORD_BOT_TOKEN and
-// DISCORD_CHANNEL_ID are set up correctly and the bot has permission to
-// post before waiting on the poller.
+// CLI helper: given a report code, fetches it from Warcraft Logs and posts
+// the exact announcement message the poller would send, to the configured
+// Discord channel. Use this to sanity-check the WCL API credentials and the
+// Discord posting path together, without waiting for a real new upload.
 //
-// Usage: npm run test-message
+// Usage: npm run test-announcement -- <report-code>
+// A report code is the part after /reports/ in a WCL report URL, e.g. for
+// https://www.warcraftlogs.com/reports/AbCdEfGhJ23K it's "AbCdEfGhJ23K" —
+// any existing report works, even an old one.
 
 import { Client, GatewayIntentBits } from 'discord.js';
 import { config } from './config.js';
+import { fetchReportByCode } from './wclClient.js';
+import { formatAnnouncement } from './poller.js';
+
+const code = process.argv[2];
+
+if (!code) {
+  console.error('Usage: npm run test-announcement -- <report-code>');
+  process.exit(1);
+}
+
+let report;
+try {
+  report = await fetchReportByCode(config.wcl, code);
+} catch (err) {
+  console.error(`[wcl] ${err.message}`);
+  process.exit(1);
+}
+
+const label = report.owner?.name ?? 'Unknown uploader';
+const message = formatAnnouncement(label, report);
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -15,18 +38,17 @@ client.once('ready', async () => {
     console.log(`[discord] Logged in as ${client.user.tag}`);
 
     const channel = await client.channels.fetch(config.discord.channelId);
-    const ogChannel = await client.channels.fetch(config.discord.ogChannelId);
     if (!channel || !channel.isTextBased()) {
       throw new Error(
         `Channel ${config.discord.channelId} was not found or is not a text channel.`
       );
     }
 
-    await channel.send('✅ Test message from Fooks bot — if you can see this, the bot is configured correctly.');
-    if (ogChannel && ogChannel.isTextBased()) {
-      await ogChannel.send('✅ Test message from Fooks bot — if you can see this, the bot is configured correctly.');
-    }
-    console.log(`[discord] Test message sent to #${channel.name ?? channel.id}.`);
+    await channel.send(message);
+    console.log(`[discord] Announcement sent to #${channel.name ?? channel.id}.`);
+    console.log(`  Title: ${report.title}`);
+    console.log(`  Uploader: ${label}`);
+    if (report.zone?.name) console.log(`  Zone: ${report.zone.name}`);
   } catch (err) {
     if (err.code === 50001) {
       console.error(

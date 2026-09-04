@@ -77,6 +77,18 @@ If it fails, double-check `DISCORD_BOT_TOKEN`/`DISCORD_CHANNEL_ID` and that the
 bot was actually invited to the server with `View Channel`/`Send Messages`
 permission on that channel.
 
+Next, confirm the Warcraft Logs side works too, using any real report code
+(the part after `/reports/` in a WCL report URL — an old report is fine):
+
+```bash
+npm run test-announcement -- <report-code>
+```
+
+This fetches that report from the WCL API and posts the exact same
+announcement message the poller would send for a real new upload, so it
+exercises the WCL credentials, the GraphQL query, and the Discord posting
+path all at once.
+
 Then start the bot for real:
 
 ```bash

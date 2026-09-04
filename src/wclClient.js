@@ -74,6 +74,9 @@ const RECENT_REPORTS_QUERY = /* GraphQL */ `
             id
             name
           }
+          fights {
+            id
+          }
         }
       }
     }
@@ -94,17 +97,27 @@ const REPORT_BY_CODE_QUERY = /* GraphQL */ `
       report(code: $code) {
         code
         title
+        startTime
+        endTime
+        zone {
+          name
+        }
         owner {
           id
           name
+        }
+        fights {
+          id
         }
       }
     }
   }
 `;
 
-// Given a report code, returns { code, title, owner: { id, name } }.
-// Useful for discovering a player's numeric user ID from a report they uploaded.
+// Given a report code, returns { code, title, startTime, endTime, zone: { name },
+// owner: { id, name }, fights: [...] }. Useful for discovering a player's numeric
+// user ID from a report they uploaded, and for building a test announcement from
+// a real report.
 export async function fetchReportByCode(credentials, code) {
   const data = await graphql(credentials, REPORT_BY_CODE_QUERY, { code });
   const report = data?.reportData?.report;
