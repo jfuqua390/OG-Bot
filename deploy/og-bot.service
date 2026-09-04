@@ -1,0 +1,38 @@
+# systemd unit for running OG-Bot continuously on Ubuntu.
+#
+# Setup:
+#   1. Copy the repo to the server, e.g. /opt/OG-Bot, and run `npm install`
+#      there.
+#   2. Edit User=/WorkingDirectory= below to match where you deployed it and
+#      which user should own the process (don't run it as root).
+#   3. sudo cp deploy/og-bot.service /etc/systemd/system/
+#   4. sudo systemctl daemon-reload
+#   5. sudo systemctl enable --now og-bot
+#
+# Useful commands:
+#   sudo systemctl status og-bot
+#   sudo journalctl -u og-bot -f
+#   sudo systemctl restart og-bot
+
+[Unit]
+Description=OG-Bot (Warcraft Logs Discord announcer)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=og-bot
+WorkingDirectory=/opt/OG-Bot
+ExecStart=/usr/bin/node src/index.js
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=/opt/OG-Bot/.env
+
+# Hardening (optional but recommended)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/OG-Bot/data
+
+[Install]
+WantedBy=multi-user.target

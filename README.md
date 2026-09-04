@@ -92,11 +92,11 @@ polling interval.
 
 A plain `npm start` only lasts as long as the terminal stays open. On an
 Ubuntu server, use the included systemd unit — see
-[`deploy/wcl-discord-bot.service`](deploy/wcl-discord-bot.service) for setup
-steps (copy the repo to the server, adjust the paths/user in the unit file,
-then `systemctl enable --now` it). systemd gives you auto-restart on crash,
-start-on-boot, and logs via `journalctl -u wcl-discord-bot -f` with no extra
-tooling needed.
+[`deploy/og-bot.service`](deploy/og-bot.service) for setup steps (copy the
+repo to the server, adjust the paths/user in the unit file, then
+`systemctl enable --now` it). systemd gives you auto-restart on crash,
+start-on-boot, and logs via `journalctl -u og-bot -f` with no extra tooling
+needed.
 
 ## Notes
 
