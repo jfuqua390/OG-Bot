@@ -121,6 +121,6 @@ needed.
   `data/seen-reports.json`. Delete it if you ever want to reset.
 - **Easter egg**: anyone who types "chewy sucks" (case-insensitive, anywhere
   in the message) in the channel at `DISCORD_OG_CHANNEL_ID` gets a gif reply.
-  See [`src/chewyResponder.js`](src/chewyResponder.js). Purely for fun — has
+  See [`src/aramResponder.js`](src/aramResponder.js). Purely for fun — has
   no effect on WCL polling, and if `DISCORD_OG_CHANNEL_ID` is unset it's
   simply disabled.

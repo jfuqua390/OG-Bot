@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { config } from './config.js';
 import { startPolling } from './poller.js';
-import { registerChewyResponder } from './chewyResponder.js';
+import {registerARAMResponder} from './aramResponder.js';
 
 const client = new Client({
   intents: [
@@ -11,7 +11,7 @@ const client = new Client({
   ],
 });
 
-registerChewyResponder(client, config.discord.ogChannelId);
+registerARAMResponder(client, config.discord.ogChannelId);
 
 client.once('ready', async () => {
   console.log(`[discord] Logged in as ${client.user.tag}`);
