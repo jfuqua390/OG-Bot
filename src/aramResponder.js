@@ -2,7 +2,7 @@
 // phrase "chewy sucks" and replies with a gif. Purely cosmetic — errors here
 // are logged and swallowed so they can never take down the poller.
 
-const TRIGGER_PHRASE = 'ARAM';
+const TRIGGER_PHRASE = 'aram';
 const GIF_URL =
   'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjZra3FoYXpmNjIweGh2d25pcGo4ejEyZG1lZHE0azBrOXNqZDZtbyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cCalRsU3yKZoQILEEI/giphy.gif';
 
