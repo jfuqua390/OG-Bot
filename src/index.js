@@ -11,7 +11,7 @@ const client = new Client({
   ],
 });
 
-registerARAMResponder(client, config.discord.ogChannelId);
+registerARAMResponder(client, config.discord.ogChannelId, config.discord.aramRoleId);
 
 client.once('ready', async () => {
   console.log(`[discord] Logged in as ${client.user.tag}`);

@@ -20,6 +20,7 @@ export const config = {
     token: requireEnv('DISCORD_BOT_TOKEN'),
     channelId: requireEnv('DISCORD_CHANNEL_ID'),
     ogChannelId: requireEnv('DISCORD_OG_CHANNEL_ID'),
+    aramRoleId: process.env.ARAM_ROLE_ID || null,
   },
   wcl: {
     clientId: requireEnv('WCL_CLIENT_ID'),

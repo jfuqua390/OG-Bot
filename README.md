@@ -11,7 +11,7 @@ announces any reports it hasn't seen before, per tracked uploader.
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) → **New Application**.
 2. Under **Bot**, click **Reset Token** / **Copy** to get your bot token. Keep it secret.
-3. Under **Bot**, enable the **Message Content Intent** toggle (a privileged intent). The bot needs this to detect the "chewy sucks" gif trigger (see below) — without it, Discord will reject the bot's login.
+3. Under **Bot**, enable the **Message Content Intent** toggle (a privileged intent). The bot needs this to detect the "aram" gif trigger (see below) — without it, Discord will reject the bot's login.
 4. Under **OAuth2 → URL Generator**, check scope `bot`, and under bot permissions check `Send Messages` and `View Channel`. Open the generated URL and invite the bot to your server.
 5. In Discord, enable Developer Mode (User Settings → Advanced), then right-click the channel you want announcements in and **Copy Channel ID**.
 
@@ -34,14 +34,17 @@ Fill in `.env`:
 DISCORD_BOT_TOKEN=...
 DISCORD_CHANNEL_ID=...
 DISCORD_OG_CHANNEL_ID=...
+ARAM_ROLE_ID=...
 WCL_CLIENT_ID=...
 WCL_CLIENT_SECRET=...
 POLL_INTERVAL_MINUTES=5
 ```
 
-`DISCORD_OG_CHANNEL_ID` is the channel the bot watches for the "chewy sucks"
-gif trigger (see [Notes](#notes)) — copy its ID the same way as
-`DISCORD_CHANNEL_ID` above.
+`DISCORD_OG_CHANNEL_ID` is the channel the bot watches for the "aram" gif
+trigger (see [Notes](#notes)) — copy its ID the same way as
+`DISCORD_CHANNEL_ID` above. `ARAM_ROLE_ID` is optional — set it to the ARAM
+role's ID (right-click the role in Server Settings → Roles with Developer
+Mode on, **Copy Role ID**) so pinging that role also triggers the gif.
 
 ## 4. Pick who to track
 
@@ -119,8 +122,9 @@ needed.
 
 - State (which report codes have already been announced) is stored in
   `data/seen-reports.json`. Delete it if you ever want to reset.
-- **Easter egg**: anyone who types "chewy sucks" (case-insensitive, anywhere
-  in the message) in the channel at `DISCORD_OG_CHANNEL_ID` gets a gif reply.
-  See [`src/aramResponder.js`](src/aramResponder.js). Purely for fun — has
-  no effect on WCL polling, and if `DISCORD_OG_CHANNEL_ID` is unset it's
-  simply disabled.
+- **Easter egg**: in the channel at `DISCORD_OG_CHANNEL_ID`, a message that's
+  just "aram" (case-insensitive), "aram?", "@aram", or a direct ping of the
+  role at `ARAM_ROLE_ID` gets a gif reply. It does *not* fire for "aram"
+  used mid-sentence (e.g. "want to aram?" won't trigger it — the message has
+  to be just the trigger). See [`src/aramResponder.js`](src/aramResponder.js).
+  Purely for fun — has no effect on WCL polling.
